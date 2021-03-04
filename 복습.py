@@ -8,6 +8,8 @@ import os
 # UI 개선 os.system('cls') 위치
 # 추가후 삭제시 날짜 남는거 수정  
 
+# 지우기 아무것도 입력 안했을 때(돌아가지도록)
+# 빈 영단어 혹은 범위 입력시 메시지
 
 def save(logs):
     with open("review.txt","w") as f:
@@ -163,7 +165,7 @@ def word():
                 try:
                     date = f"{l()[1]}.{l()[2]}"
                     
-                    print("\n\n".join([" || ".join(i) for i in logs["영어"][date]]))
+                    print("\n"+"\n\n".join([" || ".join(i) for i in logs["영어"][date]]))
                     logs["영어"][date][0] # 오늘 기록 없는지 확인용 (추가후 지우면 빈리스트 남아서)
                     today_menu = input("\n메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
                     if today_menu == "d":
