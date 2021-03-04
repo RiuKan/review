@@ -84,11 +84,13 @@ def start():
                             break
                         except IndexError:
                             print("범위를 벗어났습니다")
+                            time.sleep(0.2)
                         
                         
                     
                 except ValueError:
                     print("숫자를 적어주세요")
+                    time.sleep(0.2)
         
         else:
             try:
@@ -97,9 +99,11 @@ def start():
                     return intro
                 else:
                     print("목록에 없습니다.")
+                    time.sleep(0.2)
             except ValueError:
                 
                 print("잘못 입력하셨습니다")
+                time.sleep(0.2)
                 
 def word():
     while True:
@@ -137,6 +141,7 @@ def word():
                                 del word_list[word_list.index(word_choiced)]
                 else:
                     print("복습할 것이 없습니다.")
+                    time.sleep(0.2)
             elif word_menu == "2":
                 while True:
                 
@@ -176,11 +181,14 @@ def word():
                                     
                                 except IndexError:
                                     print("해당 번호가 없습니다")
+                                    time.sleep(0.2)
                                 except ValueError:
                                     print("숫자를 입력해주세요")
+                                    time.sleep(0.2)
                         
                 except:
                     print("오늘 기록이 없습니다.")
+                    time.sleep(0.2)
             elif word_menu == "4":
                 entire_menu = input("1. 검색 2. 날짜별 보기 b. 이전 ")
                 if entire_menu == "1":
@@ -219,8 +227,10 @@ def word():
                     
                             except KeyError:
                                 print("존재하지 않는 날짜입니다.")
+                                time.sleep(0.2)
                         except IndexError:
                             print("존재하지 않는 번호입니다.")
+                            time.sleep(0.2)
                             
                         date_delete = input("\n메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
                         if date_delete == "d":
@@ -237,8 +247,10 @@ def word():
                                                 
                                             except IndexError:
                                                 print("해당 번호가 없습니다")
+                                                time.sleep(0.2)
                                             except ValueError:
                                                 print("숫자를 입력해주세요")
+                                                time.sleep(0.2)
                                             
                                         
                                         
@@ -251,10 +263,12 @@ def word():
                         
                     else:
                          print("기록이 없습니다")
+                         time.sleep(0.2)
                 elif entire_menu == "b":
                     pass
                 else:
                     print("잘못 입력하셨습니다")
+                    time.sleep(0.2)
             elif word_menu == "b":
                 break
                     
@@ -266,30 +280,33 @@ def word():
         
         except :
             print("에러")
+            time.sleep(0.2)
     
 
 ##def collocation():
 def anything(menu):
     title = logs['목록'][menu-1]
     while True:
+        os.system('cls')
         try:
             word_menu = input(f"\n{title} 복습 입니다.\n\n1. 복습하기  2. 추가하기 3. 오늘 기록보기 4. 전체 기록보기 b. 이전 ")
             n = time.time()
             l = time.localtime
-            if word_menu == 1:
+            if word_menu == "1":
                 
                 review_list = [86400, 86400*4, 86400*7, 86400*14, 86400*30]
                 
                 word_list = []
                 for i in review_list:
                     try:
-                        for i in logs[title][f"{l(n-i)[1]}.{l(n-i)[2]}"]:
+                        for z in logs[title][f"{l(n-i)[1]}.{l(n-i)[2]}"]:
                             
-                            word_list.append(i) 
+                            word_list.append(z) 
                     except KeyError:
                         pass
                 if word_list:
                     print("복습할 진도들입니다. (b. 취소)")
+                    
                     while word_list:
                         eng_kor_choice = random.randrange(0,2)
                         word_choiced = random.choice(word_list)
@@ -306,6 +323,7 @@ def anything(menu):
                                 del word_list[word_list.index(word_choiced)]
                 else:
                     print("복습할 것이 없습니다.")
+                    time.sleep(0.2)
             elif word_menu == "2":
                 while True:                
                     today_range = input("추가할 진도를 입력하세요 (ex) 124, 124-200, 124~300 ... b. 취소 | ")
@@ -315,10 +333,13 @@ def anything(menu):
                         numbers = re.findall("\d+",today_range)
                         if not numbers:
                             print("입력되지 않았습니다.")
+                            time.sleep(0.2)
                         elif len(numbers) > 2:
                             print("한 장이나 둘 사이의 범위를 입력해주세요")
+                            time.sleep(0.2)
                         elif len(numbers) == 2 and int(numbers[0])>int(numbers[1]):
                             print("범위가 유효하지 않습니다")
+                            time.sleep(0.2)
                         else:
                             try:
                                 logs[title][f"{l()[1]}.{l()[2]}"].append(numbers)
@@ -334,6 +355,7 @@ def anything(menu):
                     
                 except:
                     print("오늘 기록이 없습니다.")
+                    time.sleep(0.2)
             elif word_menu == "4":
                 entire_menu = input("1. 검색 2. 날짜별 보기 b. 이전 ")
                 if entire_menu == "1":
@@ -347,6 +369,7 @@ def anything(menu):
                                 
                                 if not search:       
                                     print("값을 입력해주세요")
+                                    time.sleep(0.2)
                                     
                                 else:
                                     for i in logs[title].keys():
@@ -366,6 +389,7 @@ def anything(menu):
                                     break
                         except ValueError:
                             print("단일 페이지 숫자를 입력하세요")
+                            time.sleep(0.2)
                                 
                         
                                 
@@ -398,8 +422,10 @@ def anything(menu):
                     
                             except KeyError:
                                 print("존재하지 않는 날짜입니다.")
+                                time.sleep(0.2)
                         except IndexError:
                             print("존재하지 않는 번호입니다.")
+                            time.sleep(0.2)
                         
                         
                         any_date_delete = input("메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
@@ -417,8 +443,10 @@ def anything(menu):
                                         
                                     except IndexError:
                                         print("해당 번호가 없습니다")
+                                        time.sleep(0.2)
                                     except ValueError:
                                         print("숫자를 입력해주세요")
+                                        time.sleep(0.2)
                         break
                 
                         
@@ -428,12 +456,17 @@ def anything(menu):
                         
                     else:
                          print("기록이 없습니다")
+                         time.sleep(0.2)
                 elif entire_menu == "b":
                     pass
                 else:
                     print("잘못 입력하셨습니다")
+                    time.sleep(0.2)
             elif word_menu == "b":
                 break
+            else:
+                print("잘못 입력하셨습니다")
+                time.sleep(0.2)
                     
 
                 
@@ -443,6 +476,7 @@ def anything(menu):
         
         except ValueError:
             print("숫자를 입력해주세요")
+            time.sleep(0.2)
             
     
                 
