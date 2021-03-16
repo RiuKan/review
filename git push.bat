@@ -16,5 +16,5 @@ git add *
 setlocal
 set /p message= message: 
 git commit -m "%message%"
-git push origin master
+git push origin main
 set /p message= any key:
