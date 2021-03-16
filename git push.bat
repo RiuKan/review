@@ -17,3 +17,4 @@ setlocal
 set /p message= message: 
 git commit -m "%message%"
 git push origin master
+set /p message= any key:
