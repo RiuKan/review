@@ -26,7 +26,9 @@ import os
 
 # 복습 안한거 모아서 볼 수 있도록 하기
 # 암기 내용들도 입력하기
-
+# At this hour ?
+# informative (유익하다고)
+review_list = (86400*30, 86400*14, 86400*7, 86400*4, 86400 )
 def save(logs):
     with open("review.txt","w") as f:
             json.dump(logs,f)
@@ -44,7 +46,7 @@ def three_stack(li_st):
 try:
     with open("review.txt") as f:
         if not f.readlines():
-            logs = {"목록":["영어"],"영어":{"log":{}}}
+            logs = {"목록":["영어"],"영어":{"review":{}}}
         else:
             f.seek(0)
             logs = json.load(f)
@@ -55,7 +57,7 @@ except UnicodeDecodeError:
     file_error = input("파일 내용이 json 형태가 아닙니다,\n\n 수정해주세요.(파일을 초기화 하려면 n 을 누르세요.)")  
     if file_error == "n":
         with open("review.txt","w") as f:
-            logs = {"목록":["영어"],"영어":{"log":{}}}
+            logs = {"목록":["영어"],"영어":{"review":{}}}
             json.dump(logs,f)
     else:
         exit()
@@ -82,7 +84,7 @@ def start():
                 pass
             else:
                 logs["목록"].append(new)
-                logs[new] = {"log":{}}
+                logs[new] = {"review":{}}
                 save(logs)
         elif intro == "d" or intro == "D":
             while True:
@@ -122,34 +124,114 @@ def start():
                 
                 print("잘못 입력하셨습니다")
                 time.sleep(0.2)
-def delyed_cal(title):
+def delayed_cal(title):
     
     l = time.localtime
-    n = time.time()-86400 if logs[title][log]["{l()[1]}.{l()[2]}"] # 오늘꺼 복습 했는지 여부에 따라 오늘기준 어제기준 나뉘는데
-    yesterday = f"{l(n)[1]}.{l(n)[2]}"
-    review_terms = {1,4,7,14,30]
+    n = time.time()
+    y = n-86400
+    yesterday = f"{l(y)[1]}.{l(y)[2]}"
+    today = f"{l()[1]}.{l()[2]}"
     
-    for i in logs[title][log].keys():
-          objt = time.mktime(time.strptime({f"{l()[0]}."+i,"%Y.%m.%d"))
-          logs[title][log][i]      
+    review_terms = (1,4,7,14,30)
+    review_dates = logs[title]["review"].keys()
+    data_days = {}
+    
+    
+    if today in review_dates: # 오늘 복습 했으면 1회 넣기 
+        for i in logs[title].keys():
+            if i == "review":
+                continue
+            day_diff = (n-time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d")))//86400
+            for l,t in enumerate(review_terms):
+                l += 1
+                if t == day_diff: # 아래랑 여기만 차이 있음
+                    data_days[i] = l # 복습 했으면, 복습 검사 할때 오늘꺼 빼주게 됨.
+                    break
+                elif t > day_diff:
+                    data_days[i] = l-1 
+                    break
+                data_days[i] = 5
+                break
+            for k in review_dates:
+                for z in review_list:
+                    tmp_day = time.localtime(time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d"))-z) 
+                # 날짜 변환 함수 만들기
+                    day_string = f"{tmp_day[1]}.{tmp_day[2]}"
+                    if day_string in data_days:
+                        data_days[i] -= 1
+    else:   # 안했으면 1회 빼기
+        for i in logs[title].keys():
+            if i == "review":
+                continue
+            day_diff = (n-time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d")))//86400
+            for l,t in enumerate(review_terms):
+                l += 1
+                if t >= day_diff:
+                    
+                    data_days[i] = l-1
+                    break
+                data_days[i] = 5
+                break
+            for k in review_dates:
+                for z in review_list:
+                    tmp_day = time.localtime(time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d"))-z) 
+                # 날짜 변환 함수 만들기
+                    day_string = f"{tmp_day[1]}.{tmp_day[2]}"
+                    if day_string in data_days:
+                        data_days[i] -= 1
+    # 남은 횟수가 5회이면 오늘 공부할걸로 넣어서 다시 복습 시킴 (한번도 복습 안해서)
+    if 5 in data_days.values():
+        for key,value in data_days.items(): # 5번 이면 
+            if value == 5:
+                for i in logs[title][key]:
+                    for index,z in enumerate(i):
+                        i[index] = z+"*"
+                    logs[title][today].append(i)
+            
+    print('\n'.join(sorted([i+f' {x}회 미복습' for i,x in data_days.items()])))
+    # 최근 복습일, 추후 복습일 넣기
+    # 아니면 오늘 하면 가장 좋은 빠진 복습일자 추천하기
+    # 가장 오래됐고, 앞으로 예정일자도 가장 많이 남은 일자 복습
+    
+                    
+                
+                
+                                               
+            
+            
+
+    
+            
 def word():
     delayed = []
     while True:
         os.system('cls')
+##        try:
+            
+        n = time.time()
+        l = time.localtime   # 계산된 시간 변환용
         try:
-            word_menu = input("\n영어 복습 입니다.\n\n1. 복습하기  2. 추가하기 3. 오늘 기록보기 4. 전체 기록보기 b. 이전 ")
-            n = time.time()
-            l = time.localtime   # 계산된 시간 변환용
-            if word_menu == "1":
-                
-                review_list = [86400, 86400*4, 86400*7, 86400*14, 86400*30]
-                review_date = []
+            check = "오늘 복습 완료" if logs["영어"]["review"][f"{l(n)[1]}.{l(n)[2]}"] else ""
+        except KeyError:
+            check = "복습을 아직 안했습니다."
+        word_menu = input(f"\n영어 복습 입니다.\n\n{check}\n\n1. 복습하기  2. 추가하기 3. 오늘 기록보기 4. 전체 기록보기 b. 이전 ")
+        if word_menu == "1":
+            
+            
+            review_choice = input("\n1. 밀린 복습하기 2. 복습하기 ")
+            if review_choice == "1":
+                delayed_cal("영어")
+                input("돌아가려면 아무 키나 입력하시오")
+
+            elif review_choice == "2":
+            
+            
                 word_list = []
                 for i in review_list:
                     try:
-                        temp = f"{l(n-i)[1]}.{l(n-i)[2]}" 
-                        review_date.append[temp] # 아래 루프에서 쓸 데이터 미리 처리
-                        for i in logs["영어"][temp]:
+                        
+                        
+                        for i in logs["영어"][f"{l(n-i)[1]}.{l(n-i)[2]}"]:
                             
                             word_list.append(i) # 복습으로 뽑아낼 word_list 만들기
                     except KeyError: # 존재하는 날짜만 뽑아오기
@@ -174,151 +256,152 @@ def word():
                             else:
                                 del word_list[word_list.index(word_choiced)]
                                 
-                    for i in review_date: # log에 복습 횟수 갱신
-                        try:
-                            logs["영어"]["log"][review_date][0] += 1
-                            logs["영어"]["log"][review_date][1] = n # time.time()을 저장하여 계산 용이하도록 
-                        except KeyError:
-                            pass
+                    
+                    
+                    logs["영어"]["review"][f"{l(n)[1]}.{l(n)[2]}"] = True
                                 
                 
+                    
+                
+                            
+            
                 else:
                     print("복습할 것이 없습니다.")
                     time.sleep(0.2)
-                    
                 
-            elif word_menu == "2":
-                while True:
-                
-                    eng_add = input("추가할 영문을 입력하세요 | ")
-                    if eng_add == "":
-                        break
+            
+        elif word_menu == "2":
+            while True:
+            
+                eng_add = input("추가할 영문을 입력하세요 | ")
+                if eng_add == "":
+                    break
+                else:
+                    kor_add = input("그 뜻을 입력하세요 | ")
+                    if kor_add == "":
+                        pass
                     else:
-                        kor_add = input("그 뜻을 입력하세요 | ")
-                        if kor_add == "":
-                            pass
+                        try:
+                            logs["영어"][f"{l()[1]}.{l()[2]}"].append([eng_add,kor_add])
+                            
+                        except KeyError:
+                            logs["영어"][f"{l()[1]}.{l()[2]}"] =[[eng_add,kor_add]]
+                            
+        
+                        save(logs)
+                        break
+        elif word_menu == "3":
+            try:
+                date = f"{l()[1]}.{l()[2]}"
+                
+                print("\n"+"\n\n".join([" || ".join(i) for i in logs["영어"][date]]))
+                logs["영어"][date][0] # 오늘 기록 없는지 확인용 (추가후 지우면 빈리스트 남아서)
+                today_menu = input("\n메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
+                if today_menu == "d":
+                    while logs["영어"][date]:
+                        print("\n\n".join([f"({a}) " + z for a,z in enumerate([" || ".join(i) for i in logs["영어"][date]])]))
+                        
+                        choiced_date = input("지우고자 하는 번호를 입력해주세요 | ")
+                        if choiced_date == "":
+                            break
                         else:
                             try:
-                                logs["영어"][f"{l()[1]}.{l()[2]}"].append([eng_add,kor_add])
-                                
-                            except KeyError:
-                                logs["영어"][f"{l()[1]}.{l()[2]}"] =[[eng_add,kor_add]]
-                                logs["영어"]["log"][f"{l()[1]}.{l()[2]}"] = [0,None]
-            
-                            save(logs)
-                            break
-            elif word_menu == "3":
-                try:
-                    date = f"{l()[1]}.{l()[2]}"
-                    
-                    print("\n"+"\n\n".join([" || ".join(i) for i in logs["영어"][date]]))
-                    logs["영어"][date][0] # 오늘 기록 없는지 확인용 (추가후 지우면 빈리스트 남아서)
-                    today_menu = input("\n메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
-                    if today_menu == "d":
-                        while logs["영어"][date]:
-                            print("\n\n".join([f"({a}) " + z for a,z in enumerate([" || ".join(i) for i in logs["영어"][date]])]))
-                            
-                            choiced_date = input("지우고자 하는 번호를 입력해주세요 | ")
-                            if choiced_date == "":
-                                break
-                            else:
-                                try:
-                                    del logs["영어"][date][int(choiced_date)]
-                                    save(logs)
-                                    
-                                    
-                                except IndexError:
-                                    print("해당 번호가 없습니다")
-                                    time.sleep(0.2)
-                                except ValueError:
-                                    print("숫자를 입력해주세요")
-                                    time.sleep(0.2)
-                        
-                except:
-                    print("오늘 기록이 없습니다.")
-                    time.sleep(0.2)
-            elif word_menu == "4":
-                entire_menu = input("1. 검색 2. 날짜별 보기 ")
-                if entire_menu == "1":
-                    search = input("찾고자 하는 영어 혹은 한글을 적으세요. | ")
-                    if search == "":
-                        break
-                    else:
-                        for i in logs["영어"].keys():
-                            for z in logs["영어"][i]:
-                                if search in z[0] or search in z[1]:
-                                    print("\n"+" || ".join(z))
-                        print("\n\n모두 찾았습니다")
-                        input("\n돌아가시려면 아무 키나 입력하십시오")
-                    
-                elif entire_menu == "2":
-                    
-                    t = 0
-                    sort_keys = sorted(list(logs["영어"].keys()))
-                    all_list = [f"{i} [{len(logs['영어'][i])}개]" for i in sort_keys]
-                    three_stack(all_list)
-                    while True:
-                        try:
-                            date = input("해당 날짜 및 번호를 입력하세요. | ")
-                            if date == "":
-                                break
-                            else:
-                                date = sort_keys[int(date)]
-                                print("\n" + "\n\n".join([f"({i}) "+" || ".join(x) for i,x in enumerate(logs["영어"][date])]))
-                        except ValueError:
-                            
-                            
-                            try:
-                                print("\n" + "\n\n".join([f"({i}) "+" || ".join(x) for i,x in enumerate(logs["영어"][date])]))
+                                del logs["영어"][date][int(choiced_date)]
+                                save(logs)
                                 
                                 
-                    
-                            except KeyError:
-                                print("존재하지 않는 날짜입니다.")
+                            except IndexError:
+                                print("해당 번호가 없습니다")
                                 time.sleep(0.2)
-                        except IndexError:
-                            print("존재하지 않는 번호입니다.")
-                            time.sleep(0.2)
-                            
-                        date_delete = input("\n메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
-                        if date_delete == "d":
-                                    while True:
-                                        print("\n" + "\n\n".join([f"({i}) "+" || ".join(x) for i,x in enumerate(logs["영어"][date])]))
-                                        
-                                        choiced_date = input("지우고자 하는 번호를 입력해주세요 | ")
-                                        if choiced_date == "":
-                                            break
-                                        else:
-                                            try:
-                                                del logs["영어"][date][int(choiced_date)]
-                                                save(logs)
-                                                
-                                            except IndexError:
-                                                print("해당 번호가 없습니다")
-                                                time.sleep(0.2)
-                                            except ValueError:
-                                                print("숫자를 입력해주세요")
-                                                time.sleep(0.2)
-                                            
-                                        
-                                        
-                                            
-
-                        break
-                            
-                                
-                                
-                        
-                    else:
-                         print("기록이 없습니다")
-                         time.sleep(0.2)
-                elif entire_menu == "":
-                    pass
+                            except ValueError:
+                                print("숫자를 입력해주세요")
+                                time.sleep(0.2)
+                    
+            except:
+                print("오늘 기록이 없습니다.")
+                time.sleep(0.2)
+        elif word_menu == "4":
+            entire_menu = input("1. 검색 2. 날짜별 보기 ")
+            if entire_menu == "1":
+                search = input("찾고자 하는 영어 혹은 한글을 적으세요. | ")
+                if search == "":
+                    break
                 else:
-                    print("잘못 입력하셨습니다")
-                    time.sleep(0.2)
-            elif word_menu == "b":
-                break
+                    for i in logs["영어"].keys():
+                        for z in logs["영어"][i]:
+                            if search in z[0] or search in z[1]:
+                                print("\n"+" || ".join(z))
+                    print("\n\n모두 찾았습니다")
+                    input("\n돌아가시려면 아무 키나 입력하십시오")
+                
+            elif entire_menu == "2":
+                
+                t = 0
+                sort_keys = sorted(list(logs["영어"].keys()))
+                all_list = [f"{i} [{len(logs['영어'][i])}개]" for i in sort_keys]
+                three_stack(all_list)
+                while True:
+                    try:
+                        date = input("해당 날짜 및 번호를 입력하세요. | ")
+                        if date == "":
+                            break
+                        else:
+                            date = sort_keys[int(date)]
+                            print("\n" + "\n\n".join([f"({i}) "+" || ".join(x) for i,x in enumerate(logs["영어"][date])]))
+                    except ValueError:
+                        
+                        
+                        try:
+                            print("\n" + "\n\n".join([f"({i}) "+" || ".join(x) for i,x in enumerate(logs["영어"][date])]))
+                            
+                            
+                
+                        except KeyError:
+                            print("존재하지 않는 날짜입니다.")
+                            time.sleep(0.2)
+                    except IndexError:
+                        print("존재하지 않는 번호입니다.")
+                        time.sleep(0.2)
+                        
+                    date_delete = input("\n메뉴로 돌아가려면 아무키나 입력하십시오. d. 삭제 | ")
+                    if date_delete == "d":
+                                while True:
+                                    print("\n" + "\n\n".join([f"({i}) "+" || ".join(x) for i,x in enumerate(logs["영어"][date])]))
+                                    
+                                    choiced_date = input("지우고자 하는 번호를 입력해주세요 | ")
+                                    if choiced_date == "":
+                                        break
+                                    else:
+                                        try:
+                                            del logs["영어"][date][int(choiced_date)]
+                                            save(logs)
+                                            
+                                        except IndexError:
+                                            print("해당 번호가 없습니다")
+                                            time.sleep(0.2)
+                                        except ValueError:
+                                            print("숫자를 입력해주세요")
+                                            time.sleep(0.2)
+                                        
+                                    
+                                    
+                                        
+
+                    break
+                        
+                            
+                            
+                    
+                else:
+                     print("기록이 없습니다")
+                     time.sleep(0.2)
+            elif entire_menu == "":
+                pass
+            else:
+                print("잘못 입력하셨습니다")
+                time.sleep(0.2)
+        elif word_menu == "b":
+            break
                     
 
                 
@@ -326,9 +409,9 @@ def word():
                     
                 
         
-        except :
-            print("에러")
-            time.sleep(0.2)
+##        except :
+##            print("에러")
+##            time.sleep(0.2)
     
 
 ##def collocation():
@@ -337,45 +420,55 @@ def anything(menu):
     while True:
         os.system('cls')
         try:
-            word_menu = input(f"\n{title} 복습 입니다.\n\n1. 복습하기  2. 추가하기 3. 오늘 기록보기 4. 전체 기록보기 b. 이전 ")
             n = time.time()
             l = time.localtime
+            try:
+                check = "오늘 복습 완료" if logs[title]["review"][f"{l(n)[1]}.{l(n)[2]}"] else ""
+            except KeyError:
+                check = "복습을 아직 안했습니다."
+            word_menu = input(f"\n{title} 복습 입니다.\n\n{check}\n\n1. 복습하기  2. 추가하기 3. 오늘 기록보기 4. 전체 기록보기 b. 이전 ")
             if word_menu == "1":
-                
-                review_list = [86400*30, 86400*14, 86400*7, 86400*4, 86400 ]
-                
-                word_list = []
-                review_date = []
-                for i in review_list:
-                    try:
-                        temp = f"{l(n-i)[1]}.{l(n-i)[2]}"
-                        review_date.append(temp)
-                        for z in logs[title][temp]:
-                            
-                            word_list.append(["-".join(z)]) 
-                    except KeyError:
-                        pass
-                if word_list:
-                    print("\n복습할 진도들입니다. ")
-                        
-                        
-                        
-                            
-                            
-                    print("\n"+"\n".join(["\n".join(i) for i in word_list]))
-                    input("\n돌아가시려면 아무 키나 입력하십시오")
+                review_choice = input("\n1. 밀린 복습하기 2. 복습하기 ")
+                if review_choice == "1":
+                    delayed_cal("영어")
+                    input("돌아가려면 아무 키나 입력하시오")
+
+                elif review_choice == "2":
                     
-                    for i in review_date: # log에 복습 횟수 갱신
-                        try:
-                            logs[title]["log"][review_date][0] += 1
-                            logs[title]["log"][review_date][1] = n # time.time()을 저장하여 계산 용이하도록 
-                        except KeyError:
-                            pass
-                       
                         
-                else:
-                    print("복습할 것이 없습니다.")
-                    time.sleep(0.2)
+                        
+                        
+                        word_list = []
+                        
+                        for i in review_list:
+                            try:
+                                
+                                
+                                for z in logs[title][f"{l(n-i)[1]}.{l(n-i)[2]}"]:
+                                    
+                                    word_list.append(["-".join(z)]) 
+                            except KeyError:
+                                pass
+                        if word_list:
+                            print("\n복습할 진도들입니다. ")
+                                
+                                
+                                
+                                    
+                                    
+                            print("\n"+"\n".join(["\n".join(i) for i in word_list]))
+                            review_check = input("\n복습 완료 체크 하시겠습니까? Y/n | ")
+                            if review_check == "y" or review_check == "Y" or review_check == "":
+                                     logs[title]["review"][f"{l(n)[1]}.{l(n)[2]}"] = True
+                            else:
+                                pass
+                            
+                            
+                               
+                                
+                        else:
+                            print("복습할 것이 없습니다.")
+                            time.sleep(0.2)
             elif word_menu == "2":
                 while True:                
                     today_range = input("\n추가할 진도를 입력하세요 (ex) 124, 124-200, 124~300 ... | ")
@@ -397,7 +490,7 @@ def anything(menu):
                                 logs[title][f"{l()[1]}.{l()[2]}"].append(numbers)
                             except KeyError:
                                 logs[title][f"{l()[1]}.{l()[2]}"] = [numbers]
-                                logs[title]["log"][f"{l()[1]}.{l()[2]}"] = [0,None]
+                                
                             save(logs)
                             break
             elif word_menu == "3":
