@@ -1,1 +1,1 @@
-{"\ubaa9\ub85d": ["\uc601\uc5b4", "\ube45\ub370\uc774\ud130"], "\uc601\uc5b4": {"review": {}}, "\ube45\ub370\uc774\ud130": {"review": {}}}
+{"\ubaa9\ub85d": ["\uc601\uc5b4", "\ube45\ub370\uc774\ud130", "\uc778\uc0ac\uc774\ub4dc \uba38\uc2e0"], "\uc601\uc5b4": {"review": {}, "delayed": {}}, "\ube45\ub370\uc774\ud130": {"review": {}, "delayed": {"3.18": 0, "3.17": 0}, "3.18": [["51", "61"]], "3.17": [["41", "51"]]}, "\uc778\uc0ac\uc774\ub4dc \uba38\uc2e0": {"review": {}, "delayed": {}}}

@@ -43,30 +43,13 @@ def three_stack(li_st):
                 t += 3
     
 
-try:
-    with open("review.txt") as f:
-        if not f.readlines():
-            logs = {"목록":["영어"],"영어":{"review":{}}}
-        else:
-            f.seek(0)
-            logs = json.load(f)
-            
-except FileNotFoundError:
-    logs = {"목록":["영어"],"영어":{}}
-except UnicodeDecodeError:
-    file_error = input("파일 내용이 json 형태가 아닙니다,\n\n 수정해주세요.(파일을 초기화 하려면 n 을 누르세요.)")  
-    if file_error == "n":
-        with open("review.txt","w") as f:
-            logs = {"목록":["영어"],"영어":{"review":{}}}
-            json.dump(logs,f)
-    else:
-        exit()
 def start():
+    global logs
     while True:
         os.system('cls')
         intro = input(f"""복습 프로그램 입니다.
 
-(a.추가 d.삭제 p. 백업)
+(a.추가 d.삭제 p. 백업 h. 복구)
 
 
 
@@ -83,9 +66,13 @@ def start():
             if new == "":
                 pass
             else:
-                logs["목록"].append(new)
-                logs[new] = {"review":{}}
-                save(logs)
+                if new in logs:
+                        print("해당 과목이 이미 존재합니다.")
+                        time.sleep(0.2)
+                else: 
+                        logs["목록"].append(new)
+                        logs[new] = {"review":{},"delayed":{}}
+                        save(logs)
         elif intro == "d" or intro == "D":
             while True:
                 try:
@@ -111,7 +98,16 @@ def start():
                 except ValueError:
                     print("숫자를 적어주세요")
                     time.sleep(0.2)
-        
+        elif intro == "p" or intro == "P":
+            with open("backup.txt","w") as f:
+                json.dump(logs,f)
+            print("백업이 완료되었습니다.")
+            time.sleep(0.2)
+        elif intro == "h" or intro == "H":
+            with open("backup.txt","r") as f:
+                logs = json.load(f)
+            print("복구가 완료되었습니다")
+            time.sleep(0.2)
         else:
             try:
                 intro = int(intro)
@@ -126,12 +122,12 @@ def start():
                 time.sleep(0.2)
 def delayed_cal(title):
     
-    l = time.localtime
+    lt = time.localtime
     n = time.time()
     y = n-86400
-    yesterday = f"{l(y)[1]}.{l(y)[2]}"
-    today = f"{l()[1]}.{l()[2]}"
-    
+    yesterday = f"{lt(y)[1]}.{lt(y)[2]}"
+    today = f"{lt()[1]}.{lt()[2]}"
+    initialize_data = {}
     review_terms = (1,4,7,14,30)
     review_dates = logs[title]["review"].keys()
     data_days = {}
@@ -139,9 +135,9 @@ def delayed_cal(title):
     
     if today in review_dates: # 오늘 복습 했으면 1회 넣기 
         for i in logs[title].keys():
-            if i == "review":
+            if i == "review" or i == "delayed": # 키목록에 날짜 마지막에 review 키가 있어서, 제외
                 continue
-            day_diff = (n-time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d")))//86400
+            day_diff = (n-time.mktime(time.strptime(f"{lt()[0]}."+i,"%Y.%m.%d")))//86400
             for l,t in enumerate(review_terms):
                 l += 1
                 if t == day_diff: # 아래랑 여기만 차이 있음
@@ -152,18 +148,24 @@ def delayed_cal(title):
                     break
                 data_days[i] = 5
                 break
-            for k in review_dates:
-                for z in review_list:
-                    tmp_day = time.localtime(time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d"))-z) 
-                # 날짜 변환 함수 만들기
-                    day_string = f"{tmp_day[1]}.{tmp_day[2]}"
-                    if day_string in data_days:
-                        data_days[i] -= 1
+            
+            for k in range(data_days[i]):
+                z = review_list[-k-1]
+                tmp_day = time.localtime(time.mktime(time.strptime(f"{lt()[0]}."+i,"%Y.%m.%d"))+z) 
+            # 날짜 변환 함수 만들기
+                day_string = f"{tmp_day[1]}.{tmp_day[2]}"
+                if day_string in review_dates:
+                    data_days[i] -= 1
+                else:
+                    initialize_data.add(day_string)
+                    
+                    
     else:   # 안했으면 1회 빼기
         for i in logs[title].keys():
-            if i == "review":
+            if i == "review" or i == "delayed": 
                 continue
-            day_diff = (n-time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d")))//86400
+            
+            day_diff = (n-time.mktime(time.strptime(f"{lt()[0]}."+i,"%Y.%m.%d")))//86400
             for l,t in enumerate(review_terms):
                 l += 1
                 if t >= day_diff:
@@ -172,26 +174,58 @@ def delayed_cal(title):
                     break
                 data_days[i] = 5
                 break
-            for k in review_dates:
-                for z in review_list:
-                    tmp_day = time.localtime(time.mktime(time.strptime(f"{l()[0]}."+i,"%Y.%m.%d"))-z) 
-                # 날짜 변환 함수 만들기
-                    day_string = f"{tmp_day[1]}.{tmp_day[2]}"
-                    if day_string in data_days:
-                        data_days[i] -= 1
+            
+            for k in range(data_days[i]):
+                z = review_list[-k-1]
+                tmp_day = time.localtime(time.mktime(time.strptime(f"{lt()[0]}."+i,"%Y.%m.%d"))-z) 
+            # 날짜 변환 함수 만들기
+                day_string = f"{tmp_day[1]}.{tmp_day[2]}"
+                if day_string in data_days:
+                    data_days[i] -= 1
+                else:
+                    initialize_data.add(day_string)
+                    
     # 남은 횟수가 5회이면 오늘 공부할걸로 넣어서 다시 복습 시킴 (한번도 복습 안해서)
     if 5 in data_days.values():
         for key,value in data_days.items(): # 5번 이면 
             if value == 5:
+                try:
+                        logs[title][today]
+                except KeyError:
+                        logs[title][today] = []
                 for i in logs[title][key]:
                     for index,z in enumerate(i):
-                        i[index] = z+"*"
+                        i[index] = z+f" *{key}"
                     logs[title][today].append(i)
+                del data_days[key]
+                del logs[title][key]
+    for i in initialize_data:
+        logs[title]["review"][i] = True
+    try:
+        for key,value in data_days.items():
+                
+            logs[title]["delayed"][key] += data_days[key]
+    except KeyError:
+        logs[title]["delayed"][key] = data_days[key]
+    with open("review.txt","w") as f:
+        json.dump(logs,f)
+        
+        # 51-61
+    
             
-    print('\n'.join(sorted([i+f' {x}회 미복습' for i,x in data_days.items()])))
+            
+        
+    
+                    
+                        
+            
+    
+    
     # 최근 복습일, 추후 복습일 넣기
     # 아니면 오늘 하면 가장 좋은 빠진 복습일자 추천하기
     # 가장 오래됐고, 앞으로 예정일자도 가장 많이 남은 일자 복습
+    # 4일 기준으로 잡기
+    
     
                     
                 
@@ -204,6 +238,7 @@ def delayed_cal(title):
             
 def word():
     delayed = []
+    delayed_cal("영어")
     while True:
         os.system('cls')
 ##        try:
@@ -220,7 +255,7 @@ def word():
             
             review_choice = input("\n1. 밀린 복습하기 2. 복습하기 ")
             if review_choice == "1":
-                delayed_cal("영어")
+                
                 input("돌아가려면 아무 키나 입력하시오")
 
             elif review_choice == "2":
@@ -338,6 +373,7 @@ def word():
                 
                 t = 0
                 sort_keys = sorted(list(logs["영어"].keys()))
+                sort_keys.remove("review");sort_keys.remove("delayed")
                 all_list = [f"{i} [{len(logs['영어'][i])}개]" for i in sort_keys]
                 three_stack(all_list)
                 while True:
@@ -417,6 +453,7 @@ def word():
 ##def collocation():
 def anything(menu):
     title = logs['목록'][menu-1]
+    delayed_cal(title)
     while True:
         os.system('cls')
         try:
@@ -430,7 +467,7 @@ def anything(menu):
             if word_menu == "1":
                 review_choice = input("\n1. 밀린 복습하기 2. 복습하기 ")
                 if review_choice == "1":
-                    delayed_cal("영어")
+                    
                     input("돌아가려면 아무 키나 입력하시오")
 
                 elif review_choice == "2":
@@ -566,6 +603,7 @@ def anything(menu):
                     
                     t = 0
                     sort_keys = sorted(list(logs[title].keys()))
+                    sort_keys.remove("review");sort_keys.remove("delayed")
                     all_list = [f"{i} [{len(logs[title][i])}개]" for i in sort_keys]
                     three_stack(all_list)
                     
@@ -646,7 +684,23 @@ def anything(menu):
     
                 
 
-            
+try:
+    with open("review.txt") as f:
+        if not f.readlines():
+            logs = {"목록":["영어"],"영어":{"review":{},"delayed":{}}}
+        else:
+            f.seek(0)
+            logs = json.load(f)            
+except FileNotFoundError:
+    logs = {"목록":["영어"],"영어":{"review":{},"delayed":{}}}
+except UnicodeDecodeError:
+    file_error = input("파일 내용이 json 형태가 아닙니다,\n\n 수정해주세요.(파일을 초기화 하려면 n 을 누르세요.)")  
+    if file_error == "n":
+        with open("review.txt","w") as f:
+            logs = {"목록":["영어"],"영어":{"review":{},"delayed":{}}}
+            json.dump(logs,f)
+    else:
+        exit()            
 while True:
     
     menu = start()
