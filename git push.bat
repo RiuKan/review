@@ -1,5 +1,5 @@
 @echo off
-set /p initi= git init? (Y or n): 
+set /p initi= git init? (y or N): 
 
 if "%initi%" == "Y" git init
 if "%initi%" == "Y" set /p remote= remote address? 
