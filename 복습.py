@@ -444,6 +444,7 @@ def word():
             review_choice = input("\n1. 밀린 복습하기 2. 복습하기 ")
             if review_choice == "1":
                 delayed_play("영어")
+                save(logs)
         
             elif review_choice == "2":
             
@@ -468,7 +469,7 @@ def word():
                     while word_list: 
                         eng_kor_choice = random.randrange(0,2)
                         word_choiced = random.choice(word_list) # 랜덤한 문장과 뜻 순서, input으로 물어보기
-                        first = input(word_choiced[eng_kor_choice])
+                        first = input("\n"+ word_choiced[eng_kor_choice])
                         if first == "b":
                            break
                         else:
@@ -482,13 +483,13 @@ def word():
                     
                     
                     logs["영어"]["review"][f"{l(n)[1]}.{l(n)[2]}"] = True
-                    
+                    save(logs)
                      
                 
                     
                 
                             
-                    break
+                    
                 else:
                     print("복습할 것이 없습니다.")
                     time.sleep(0.2)
@@ -663,7 +664,7 @@ def anything(menu):
                 review_choice = input("\n1. 밀린 복습하기 2. 복습하기 ")
                 if review_choice == "1":
                     delayed_play(title)
-
+                    save(logs)
                 elif review_choice == "2":
                     
                         
@@ -691,6 +692,7 @@ def anything(menu):
                             review_check = input("\n복습 완료 체크 하시겠습니까? Y/n | ")
                             if review_check == "y" or review_check == "Y" or review_check == "":
                                      logs[title]["review"][f"{l(n)[1]}.{l(n)[2]}"] = True
+                                     save(logs)
                             else:
                                 pass
                             
