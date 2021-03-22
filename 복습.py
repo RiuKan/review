@@ -292,13 +292,15 @@ def delayed_play(title):
                 
                 numbers_2, recent_review_2 = 0,None
             
-            if not recent_review_1 or recent_review_2:
+            
+            if recent_review_1 == None and recent_review_2 == None:
                 time_diff = None
             elif recent_review_1 and recent_review_2:
                 time_diff = (time.time() - time.mktime(time.strptime(f"{time.localtime()[0]}."+ (recent_review_1 if recent_review_1>=recent_review_2 else recent_review_2) ,"%Y.%m.%d")))//86400
             else:
                 time_diff = (time.time() - time.mktime(time.strptime(f"{time.localtime()[0]}."+ (recent_review_1 if recent_review_1 else recent_review_2) ,"%Y.%m.%d")))//86400 # 올해만 작동하게 되어있음
-            print (f"\n\n({index}) {key} 일자 :: {str(time_diff) + ' 일 전 복습' if time_diff else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습 | {str(int(next_review))+'일 후 복습 예정' if next_review else '예정 없음'}")
+            
+            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff != None else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습 | {str(int(next_review))+'일 후 복습 예정' if next_review else '예정 없음'}")
             
             
             if (next_review == None or next_review > 3) and (time_diff == None or time_diff > 3):
@@ -424,7 +426,7 @@ def delayed_play(title):
     
             
 def word():
-    delayed = []
+    
     
     while True:
         
@@ -549,7 +551,7 @@ def word():
                 print("오늘 기록이 없습니다.")
                 time.sleep(0.2)
         elif word_menu == "4":
-            entire_menu = input("1. 검색 2. 날짜별 보기 ")
+            entire_menu = input("\n1. 검색 2. 날짜별 보기 ")
             if entire_menu == "1":
                 search = input("찾고자 하는 영어 혹은 한글을 적으세요. | ")
                 if search == "":
