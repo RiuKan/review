@@ -183,7 +183,7 @@ def delayed_cal(title):
             # 날짜 변환 함수 만들기
                 day_string = f"{tmp_day[1]}.{tmp_day[2]}"
                  # 첫번째 걸린 날짜 가 최근 복습 일자라서 
-                if day_string in review_dates:
+                if day_string in logs[title]["review"]:
                     data_days[i][0] -= 1
                     if count == 0:
                         data_days[i].append(day_string)
@@ -195,6 +195,7 @@ def delayed_cal(title):
                     
     else:   # 안했으면 1회 빼기
         for i in logs[title].keys():
+            
             if i == "review" or i == "delayed": 
                 continue
             data_days[i] = []
@@ -202,6 +203,7 @@ def delayed_cal(title):
             for l,t in enumerate(review_terms):
                 l += 1
                 if t >= day_diff:
+                    
                     
                     data_days[i].append(l-1)
                     data_days[i].append(review_terms[l]-day_diff)
@@ -221,7 +223,7 @@ def delayed_cal(title):
             # 날짜 변환 함수 만들기
                 day_string = f"{tmp_day[1]}.{tmp_day[2]}"
                 
-                if day_string in data_days:
+                if day_string in logs[title]["review"]:
                     data_days[i][0] -= 1
                     if count == 0:
                         data_days[i].append(day_string)
@@ -366,7 +368,7 @@ def delayed_play(title):
                 
                     
                         
-                print(contents)
+                
                 for z in contents:
                             
                             word_list.append(["-".join(z)]) 
