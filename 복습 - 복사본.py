@@ -22,7 +22,7 @@ import os
 # 날라감 방지로 주기적 복사 기능 넣기
 
 # 중복 실행 방지
-
+# 데이터 구조에 코드가 종속되니까, 데이터 구조 처음에 잘 골라야함. 중간에 바꾸면 혼선
 # invalid syntax 에러도 나오게 하려면 어떻게하지?
 
 # 영어는 데이터 공부 기능도 넣기 (공부한 거 복습)
@@ -33,9 +33,10 @@ import os
 # informative (유익하다고)
 
 # 암기 내용 추가도 괜찮을 듯.
+file_name = "tmpfile.txt"
 review_list = (86400*30, 86400*14, 86400*7, 86400*4, 86400)
 def save(logs):
-    with open("review.txt","w") as f:
+    with open(file_name,"w") as f:
             json.dump(logs,f)
 def three_stack(li_st):
     t = 0
@@ -150,7 +151,7 @@ def delayed_cal(title):
     if today in review_dates: # 오늘 복습 했으면 1회 넣기
         # 각각 학습날짜 와 현재날짜 차이 계산해서, 복습 필수 횟수  넣기
         for i in logs[title].keys():
-            if i == "review" or i == "delayed": # 키목록에 날짜 마지막에 review 키가 있어서, 제외 # 데이터 구조 개편 필요
+            if i == "review" or i == "delayed": # 키목록에 날짜 마지막에 review 키가 있어서, 제외
                 continue
             data_days[i] = []
             day_diff = (n-time.mktime(time.strptime(f"{lt()[0]}."+i,"%Y.%m.%d")))//86400
@@ -173,8 +174,7 @@ def delayed_cal(title):
                         data_days[i].append(5)
                         data_days[i].append(None)
                     continue
-            delayed_all = data_days[i][0]
-            print(delayed_all)
+                
             # 복습한 횟수 빼내기
             count = 0 
             for k in range(data_days[i][0]):
@@ -189,11 +189,9 @@ def delayed_cal(title):
                     data_days[i][0] -= 1
                     if count == 0:
                         data_days[i].append(day_string)
-                        
                     count += 1
             if count == 0:
                 data_days[i].append(None)
-            data_days[i].append(delayed_all)
                
                     
                     
@@ -217,7 +215,7 @@ def delayed_cal(title):
                         data_days[i].append(5)
                         data_days[i].append(None)
                     continue
-            delayed_all = data_days[i][0]    
+                
             count = 0
             for k in range(data_days[i][0]):
                 z = review_list[-k-1]
@@ -231,11 +229,10 @@ def delayed_cal(title):
                     data_days[i][0] -= 1
                     if count == 0:
                         data_days[i].append(day_string)
-                        
                     count += 1
             if count == 0:
                 data_days[i].append(None)
-            data_days[i].append(delayed_all)
+
         
     
     for key,value in data_days.items():
@@ -264,12 +261,12 @@ def delayed_cal(title):
     for i in delete:
         del logs[title]["delayed"][i]
 
-    with open("review.txt","w") as f:
+    with open(file_name,"w") as f:
         json.dump(logs,f)
 def delayed_play(title):
     delayed_cal(title)
     recommend = []
-    delay_dict = logs[title]["delayed"] # {학습날짜:[밀린 횟수,예정 복습까지 남은 일수,최근 복습일,필요 총 복습회수],did:{학습날짜:[복습횟수,최근 복습일]}}
+    delay_dict = logs[title]["delayed"] # {학습날짜:[밀린 횟수,예정 복습까지 남은 일수,최근 복습일],did:{학습날짜:[복습횟수,최근 복습일]}}
     try:
         delay_did = logs[title]["delayed"]["did"]
     except KeyError:
@@ -290,8 +287,8 @@ def delayed_play(title):
     if key_list:
     
         for index, key in enumerate(delay_dict_keys):
-            print(key)
-            numbers_1, next_review, recent_review_1, stage = delay_dict[key][0],delay_dict[key][1],(delay_dict[key][2] if delay_dict[key][2] else None),(delay_dict[key][3]-delay_dict[key][0])
+            
+            numbers_1, next_review, recent_review_1 = delay_dict[key][0],delay_dict[key][1],(delay_dict[key][2] if delay_dict[key][2] else None)
             try:
                 numbers_2, recent_review_2 = delay_did[key][0], delay_did[key][1]
                 
@@ -307,7 +304,7 @@ def delayed_play(title):
             else:
                 time_diff = (time.time() - time.mktime(time.strptime(f"{time.localtime()[0]}."+ (recent_review_1 if recent_review_1 else recent_review_2) ,"%Y.%m.%d")))//86400 # 올해만 작동하게 되어있음
             
-            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff != None else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습, {stage + numbers_2 + 1}회차 | {str(int(next_review))+'일 후 복습 예정' if next_review else '예정 없음'}")
+            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff != None else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습 | {str(int(next_review))+'일 후 복습 예정' if next_review else '예정 없음'}")
             
             
             if (next_review == None or next_review > 3) and (time_diff == None or time_diff > 3):
@@ -678,7 +675,7 @@ def anything(menu):
                     
                         
                         
-                        delayed_cal(title)
+                        
                         word_list = []
                         
                         for i in review_list:
@@ -686,24 +683,18 @@ def anything(menu):
                                 
                                 
                                 for z in logs[title][f"{l(n-i)[1]}.{l(n-i)[2]}"]:
-                                    try:
-                                        times = str(logs[title]['delayed'][f"{l(n-i)[1]}.{l(n-i)[2]}"][3]+logs[title]['delayed']['did'][0])
-                                    except KeyError:
-                                        trm = (1,4,7,14,30)
-                                        day_diff = i//86400
-                                        times = str(trm.index(day_diff))
-                                    word_list.append("-".join(z) + f" | {times}" +" 회차") 
+                                    
+                                    word_list.append(["-".join(z)]) 
                             except KeyError:
                                 pass
                         if word_list:
-                            
                             print("\n복습할 진도들입니다. ")
                                 
                                 
                                 
                                     
-                                  
-                            print("\n"+"\n".join(word_list))
+                                    
+                            print("\n"+"\n".join(["\n".join(i) for i in word_list]))
                             review_check = input("\n복습 완료 체크 하시겠습니까? Y/n | ")
                             if review_check == "y" or review_check == "Y" or review_check == "":
                                      logs[title]["review"][f"{l(n)[1]}.{l(n)[2]}"] = True
@@ -900,19 +891,19 @@ def anything(menu):
                 
 
 try:
-    with open("review.txt") as f:
+    with open(file_name) as f:
         if not f.readlines():
-            logs = {"목록":["영어"],"영어":{"review":{},"delayed":{}}}
+            logs = {"목록":["영어"],"영어":{}}
         else:
             f.seek(0)
             logs = json.load(f)            
 except FileNotFoundError:
-    logs = {"목록":["영어"],"영어":{"review":{},"delayed":{}}}
+    logs = {"목록":["영어"],"영어":{}}
 except UnicodeDecodeError:
     file_error = input("파일 내용이 json 형태가 아닙니다,\n\n 수정해주세요.(파일을 초기화 하려면 n 을 누르세요.)")  
     if file_error == "n":
-        with open("review.txt","w") as f:
-            logs = {"목록":["영어"],"영어":{"review":{},"delayed":{}}}
+        with open(file_name,"w") as f:
+            logs = {"목록":["영어"],"영어":{}}
             json.dump(logs,f)
     else:
         exit()            

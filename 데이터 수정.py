@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import copy
 input("데이터를 수정합니다 작업 전 백업 해놓으세요.")
 with open("review.txt","r") as f:
     logs = json.load(f)
