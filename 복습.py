@@ -10,7 +10,7 @@ import os
 # UI 개선 os.system('cls') 위치
 # 추가후 삭제시 날짜 남는거 수정
 # 수정기능 
-
+# 좌우 키로 선택할 수 있도록 만들어보기 
 # 아무것도 입력안하면 뒤로가기 
 # 지우기 아무것도 입력 안했을 때(돌아가지도록)
 # 빈 영단어 혹은 범위 입력시 메시지
@@ -210,7 +210,7 @@ def delayed_cal(title):
                     
                     
                     data_days[i].append(l-1)
-                    data_days[i].append(review_terms[l]-day_diff)
+                    data_days[i].append(review_terms[l-1]-day_diff)
                     break
                 else:
                     if l==5:
@@ -290,7 +290,7 @@ def delayed_play(title):
     if key_list:
     
         for index, key in enumerate(delay_dict_keys):
-            print(key)
+            
             numbers_1, next_review, recent_review_1, stage = delay_dict[key][0],delay_dict[key][1],(delay_dict[key][2] if delay_dict[key][2] else None),(delay_dict[key][3]-delay_dict[key][0])
             try:
                 numbers_2, recent_review_2 = delay_did[key][0], delay_did[key][1]
@@ -307,7 +307,7 @@ def delayed_play(title):
             else:
                 time_diff = (time.time() - time.mktime(time.strptime(f"{time.localtime()[0]}."+ (recent_review_1 if recent_review_1 else recent_review_2) ,"%Y.%m.%d")))//86400 # 올해만 작동하게 되어있음
             
-            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff != None else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습, {stage + numbers_2 + 1}회차 | {str(int(next_review))+'일 후 복습 예정' if next_review else '예정 없음'}")
+            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff > 0 else '오늘 복습' if time_diff == 0 else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습, {stage + numbers_2 + 1}회차 | {str(int(next_review))+'일 후 복습 예정' if next_review > 0 else '오늘 복습 예정' if next_review == 0 else '예정 없음'}")
             
             
             if (next_review == None or next_review > 3) and (time_diff == None or time_diff > 3):
