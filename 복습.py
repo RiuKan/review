@@ -307,7 +307,7 @@ def delayed_play(title):
             else:
                 time_diff = (time.time() - time.mktime(time.strptime(f"{time.localtime()[0]}."+ (recent_review_1 if recent_review_1 else recent_review_2) ,"%Y.%m.%d")))//86400 # 올해만 작동하게 되어있음
             
-            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff > 0 else '오늘 복습' if time_diff == 0 else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습, {stage + numbers_2 + 1}회차 | {str(int(next_review))+'일 후 복습 예정' if next_review > 0 else '오늘 복습 예정' if next_review == 0 else '예정 없음'}")
+            print (f"\n\n({index}) {key} 일자 :: {str(int(time_diff)) + ' 일 전 복습' if time_diff and time_diff > 0 else '오늘 복습' if time_diff == 0 else '이전 복습 없음' } | {numbers_1-numbers_2} 회 미복습, {stage + numbers_2 + 1}회차 | {str(int(next_review))+'일 후 복습 예정' if next_review and next_review > 0 else '오늘 복습 예정' if next_review == 0 else '예정 없음'}")
             
             
             if (next_review == None or next_review > 3) and (time_diff == None or time_diff > 3):
